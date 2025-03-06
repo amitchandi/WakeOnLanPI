@@ -1,0 +1,6 @@
+@WakeOnLanPi_HostAddress = http://localhost:5252
+
+GET {{WakeOnLanPi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
