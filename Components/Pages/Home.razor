@@ -1,0 +1,33 @@
+﻿@page "/"
+@inject MainService mainService
+@rendermode InteractiveServer
+
+<PageTitle>Home</PageTitle>
+
+<div class="container">
+    Server Status: <span class="@status_class">@isOn</span>
+</div>
+
+<div class="container mt-2">
+    <button class="btn btn-outline-primary" @onclick="SendWake">Send Wake</button>
+</div>
+
+@code {
+    private string isOn = "";
+    private string status_class = "text-danger";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Run(() =>
+        {
+            var status = mainService.GetStatus().IsOn;
+            isOn = status ? "Online" : "Offline";
+            status_class = status ? "text-success" : "text-danger";
+        });
+    }
+
+    void SendWake()
+    {
+        mainService.SendWake();
+    }
+}

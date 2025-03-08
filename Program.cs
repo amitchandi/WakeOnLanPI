@@ -1,56 +1,43 @@
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Diagnostics;
+using WoLPi.Components;
 
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+namespace WoLPi;
+public class Program
 {
-    app.MapOpenApi();
-}
-
-// app.UseHttpsRedirection();
-
-string targetIp = app.Configuration["TargetIp"] ?? throw new Exception("TargetIp is missing from config");
-string targetMac = app.Configuration["TargetMac"] ?? throw new Exception("TargetMac is missing from config");
-
-app.MapGet("/status", async (context) =>
-{
-    // return some information about status of the server(s)
-    Ping pingSender = new Ping();
-    PingOptions options = new PingOptions();
-
-    // Use the default Ttl value which is 128,
-    // but change the fragmentation behavior.
-    options.DontFragment = true;
-
-    // Create a buffer of 32 bytes of data to be transmitted.
-    string data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-    byte[] buffer = Encoding.ASCII.GetBytes(data);
-    int timeout = 120;
-    PingReply reply = pingSender.Send(targetIp, timeout, buffer, options);
-
-    var resp = new
+    public static void Main(string[] args)
     {
-        IsOn = reply.Status == IPStatus.Success
-    };
+        var builder = WebApplication.CreateBuilder(args);
 
-    await context.Response.WriteAsJsonAsync(resp);
-})
-.WithName("GetStatus");
+        // Add services to the container.
+        builder.Services.AddRazorComponents()
+            .AddInteractiveServerComponents();
 
-app.MapGet("/wake", () =>
-{
-    Process.Start($"wakeonlan", $"{targetMac}");
-    return "Done";
-})
-.WithName("Wake");
+        builder.Services.AddSingleton<MainService>();
 
-app.Run();
+        var app = builder.Build();
+
+        // Configure the HTTP request pipeline.
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseExceptionHandler("/Error");
+        }
+
+        app.MapGet("/api/status", async (HttpContext context, MainService service) =>
+        {
+            await context.Response.WriteAsJsonAsync(service.GetStatus());
+        });
+
+        app.MapGet("/api/wake", (MainService service) =>
+        {
+            service.SendWake();
+            return "Magic Packet Sent";
+        });
+
+        app.UseAntiforgery();
+
+        app.MapStaticAssets();
+        app.MapRazorComponents<App>()
+            .AddInteractiveServerRenderMode();
+
+        app.Run();
+    }
+}
