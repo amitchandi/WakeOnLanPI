@@ -1,38 +1,32 @@
 ﻿using System.Diagnostics;
 using System.Net.NetworkInformation;
-using System.Text;
-using WoLPi.Components;
+using System.Timers;
 
 namespace WoLPi;
 
-public class MainService
+public class MainService : IDisposable
 {
     IConfiguration configuration { get; set; }
     string TargetIpAddress;
     string TargetMacAddress;
+
+    public System.Timers.Timer Timer { get; set; }
 
     public MainService(IConfiguration configuration)
     {
         this.configuration = configuration;
         TargetIpAddress = configuration["TargetIp"] ?? throw new Exception("TargetIp is missing from config");
         TargetMacAddress = configuration["TargetMac"] ?? throw new Exception("TargetMac is missing from config");
+        Timer = new System.Timers.Timer(10 * 1000);
+        Timer.Start();
     }
 
     public Status GetStatus()
     {
         // return some information about status of the server(s)
-        Ping pingSender = new Ping();
-        PingOptions options = new PingOptions();
-
-        // Use the default Ttl value which is 128,
-        // but change the fragmentation behavior.
-        options.DontFragment = true;
-
-        // Create a buffer of 32 bytes of data to be transmitted.
-        string data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-        byte[] buffer = Encoding.ASCII.GetBytes(data);
+        Ping pingSender = new();
         int timeout = 120;
-        PingReply reply = pingSender.Send(TargetIpAddress, timeout, buffer, options);
+        PingReply reply = pingSender.Send(TargetIpAddress, timeout);
 
         return new()
         {
@@ -48,5 +42,10 @@ public class MainService
     public struct Status
     {
         public bool IsOn { get; set; }
+    }
+
+    public void Dispose()
+    {
+        Timer.Dispose();
     }
 }
