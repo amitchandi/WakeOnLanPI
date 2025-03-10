@@ -1,51 +1,33 @@
-﻿using System.Diagnostics;
-using System.Net.NetworkInformation;
-using System.Timers;
+﻿using System.Net.NetworkInformation;
+using MagicPacket;
 
 namespace WoLPi;
 
-public class MainService : IDisposable
+public class MainService(IConfiguration configuration)
 {
-    IConfiguration configuration { get; set; }
-    string TargetIpAddress;
-    string TargetMacAddress;
+    readonly string TargetIpAddress = configuration["TargetIp"] ?? throw new Exception("TargetIp is missing from config");
+    readonly string TargetMacAddress = configuration["TargetMac"] ?? throw new Exception("TargetMac is missing from config");
+    readonly int PingTimeout = 120;
 
-    public System.Timers.Timer Timer { get; set; }
-
-    public MainService(IConfiguration configuration)
-    {
-        this.configuration = configuration;
-        TargetIpAddress = configuration["TargetIp"] ?? throw new Exception("TargetIp is missing from config");
-        TargetMacAddress = configuration["TargetMac"] ?? throw new Exception("TargetMac is missing from config");
-        Timer = new System.Timers.Timer(10 * 1000);
-        Timer.Start();
-    }
-
-    public Status GetStatus()
+    public async Task<Status> GetStatusAsync()
     {
         // return some information about status of the server(s)
         Ping pingSender = new();
-        int timeout = 120;
-        PingReply reply = pingSender.Send(TargetIpAddress, timeout);
-
+        var reply = await pingSender.SendPingAsync(TargetIpAddress, PingTimeout);
         return new()
         {
             IsOn = reply.Status == IPStatus.Success
         };
     }
 
-    public void SendWake()
+    public async Task SendWake()
     {
-        Process.Start($"wakeonlan", $"{TargetMacAddress}");
+        MagicPacketClient client = new();
+        await client.BroadcastOnAllInterfacesAsync(TargetMacAddress);
     }
 
     public struct Status
     {
         public bool IsOn { get; set; }
-    }
-
-    public void Dispose()
-    {
-        Timer.Dispose();
     }
 }

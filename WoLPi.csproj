@@ -7,4 +7,8 @@
     <UserSecretsId>76f28e51-e509-4381-966a-c7671edbfb2e</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MagicPacket" Version="1.2.0" />
+  </ItemGroup>
+
 </Project>

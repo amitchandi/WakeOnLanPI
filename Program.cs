@@ -11,7 +11,7 @@ public class Program
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
 
-        builder.Services.AddSingleton<MainService>();
+        builder.Services.AddScoped<MainService>();
 
         var app = builder.Build();
 
@@ -23,12 +23,12 @@ public class Program
 
         app.MapGet("/api/status", async (HttpContext context, MainService service) =>
         {
-            await context.Response.WriteAsJsonAsync(service.GetStatus());
+            await context.Response.WriteAsJsonAsync(await service.GetStatusAsync());
         });
 
-        app.MapGet("/api/wake", (MainService service) =>
+        app.MapGet("/api/wake", async (MainService service) =>
         {
-            service.SendWake();
+            await service.SendWake();
             return "Magic Packet Sent";
         });
 

@@ -1,4 +1,5 @@
 ﻿@page "/"
+@implements IDisposable
 @inject MainService mainService
 @rendermode InteractiveServer
 
@@ -13,23 +14,20 @@
 </div>
 
 @code {
-    private string isOn = "";
-    private string status_class = "text-danger";
-
-    protected override async Task OnInitializedAsync()
-    {
-        await UpdateStatus();
-    }
+    private string isOn = "Loading...";
+    private string status_class = "text-info";
+    System.Timers.Timer timer = new(TimeSpan.FromSeconds(2));
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender)
-            return;
-
-        mainService.Timer.Elapsed += async (o, args) =>
+        if (firstRender)
         {
-            await UpdateStatus();
-        };
+            timer.Elapsed += async (o, args) =>
+            {
+                await UpdateStatus();
+            };
+            timer.Start();
+        }
 
         StateHasChanged(); // IF NOT USED, your updated version of states will not get rendered
         await base.OnAfterRenderAsync(firstRender); // Not required, it just returns the `Task.CompletedTask;`
@@ -37,17 +35,19 @@
 
     async Task UpdateStatus()
     {
-        await Task.Run(() =>
-        {
-            var status = mainService.GetStatus().IsOn;
-            isOn = status ? "Online" : "Offline";
-            status_class = status ? "text-success" : "text-danger";
-            InvokeAsync(() => StateHasChanged());
-        });
+        var status = await mainService.GetStatusAsync();
+        isOn = status.IsOn ? "Online" : "Offline";
+        status_class = status.IsOn ? "text-success" : "text-danger";
+        await InvokeAsync(() => StateHasChanged());
     }
 
-    void SendWake()
+    async void SendWake()
     {
-        mainService.SendWake();
+        await mainService.SendWake();
+    }
+
+    public void Dispose()
+    {
+        timer.Dispose();
     }
 }
