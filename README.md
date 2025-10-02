@@ -1,7 +1,6 @@
 # WakeOnLanPI
-# WakeOnLan Pi
 
-WakeOnLan Pi is a lightweight .NET web application that exposes a simple REST API for sending **Wake-on-LAN (WOL)** packets from a Raspberry Pi to devices on your local network.  
+WakeOnLan Pi is a lightweight .NET web application that exposes a simple REST API for sending **Wake-on-LAN (WOL)** magic packets from a Raspberry Pi to devices on your local network.  
 
 This allows you to remotely power on servers, desktops, or other devices without needing direct access to the machine.
 
@@ -19,7 +18,7 @@ This allows you to remotely power on servers, desktops, or other devices without
 ## Requirements
 
 - Raspberry Pi (or any device running Linux/Windows)  
-- [.NET 8 SDK/Runtime](https://dotnet.microsoft.com/download)  
+- [.NET 9 SDK/Runtime](https://dotnet.microsoft.com/download)  
 - A device that supports Wake-on-LAN, with WOL enabled in its BIOS/UEFI and network adapter settings  
 
 ---
@@ -29,9 +28,9 @@ This allows you to remotely power on servers, desktops, or other devices without
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/amitchandi/WakeOnLanPI.go
-   cd WakeOnLan-Pi
+   git clone https://github.com/amitchandi/WakeOnLanPI.git
+   cd WakeOnLanPI
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbOTUzNzg5NzYsMTIyNzc4NjAxNV19
+eyJoaXN0b3J5IjpbLTQ3MzQwODAzLDEyMjc3ODYwMTVdfQ==
 -->
