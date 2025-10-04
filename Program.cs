@@ -11,7 +11,13 @@ public class Program
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
 
-        builder.Services.AddScoped<MainService>();
+        builder.Services
+            .AddScoped<MainService>();
+            // .Configure<List<Server>>(builder.Configuration.GetRequiredSection("Servers"));
+
+        var servers = ServerConfigLoader.Load("config.yaml");
+        builder.Services.AddSingleton(servers);
+
 
         var app = builder.Build();
 
@@ -21,15 +27,25 @@ public class Program
             app.UseExceptionHandler("/Error");
         }
 
-        app.MapGet("/api/status", async (HttpContext context, MainService service) =>
+        app.MapGet("/api/status/{HostnameOrAddress}", async (HttpContext context, MainService service, string HostnameOrAddress) =>
         {
-            await context.Response.WriteAsJsonAsync(await service.GetStatusAsync());
+            var status = await service.GetStatusAsync(HostnameOrAddress);
+            context.Response.StatusCode = status.Error == null ? 400 : 200;
+            await context.Response.WriteAsJsonAsync(status);
         });
 
-        app.MapGet("/api/wake", async (MainService service) =>
+        app.MapGet("/api/wake/{MacAddress}", async (string MacAddress, MainService service) =>
         {
-            await service.SendWake();
-            return "Magic Packet Sent";
+            try
+            {
+                await service.SendWake(MacAddress);
+                return "Magic Packet Sent";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return "Something went wrong.";
+            }
         });
 
         app.UseAntiforgery();

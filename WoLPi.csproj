@@ -7,4 +7,9 @@
     <UserSecretsId>76f28e51-e509-4381-966a-c7671edbfb2e</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="WakeOnLAN" Version="2.0.2" />
+    <PackageReference Include="YamlDotNet" Version="16.3.0" />
+  </ItemGroup>
+
 </Project>

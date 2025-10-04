@@ -1,22 +1,38 @@
 ﻿@page "/"
+@using Microsoft.Extensions.Options
 @implements IDisposable
 @inject MainService mainService
+@inject IConfiguration Configuration
+@inject List<Server> Servers
+@inject IJSRuntime JSRuntime
+
 @rendermode InteractiveServer
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Wol Pi</PageTitle>
 
 <div class="container">
     Server Status: <span class="@status_class">@isOn</span>
 </div>
 
 <div class="container mt-2">
-    <button class="btn btn-outline-primary" @onclick="SendWake">Send Wake</button>
+    @* <button class="btn btn-outline-primary" @onclick="SendWake">Send Wake</button> *@
 </div>
+
+@foreach (var server in Servers)
+{
+    <article>
+        <header>@server.Name - </header>
+        @server.HostnameOrAddress
+        @server.MacAddress
+    </article>
+}
+
+<AddServerDialog />
 
 @code {
     private string isOn = "Loading...";
     private string status_class = "text-info";
-    System.Timers.Timer timer = new(TimeSpan.FromSeconds(2));
+    private System.Timers.Timer timer = new(TimeSpan.FromSeconds(2));
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -41,13 +57,15 @@
         await InvokeAsync(() => StateHasChanged());
     }
 
-    async void SendWake()
+    async void SendWake(string MacAddress)
     {
-        await mainService.SendWake();
+        await mainService.SendWake(MacAddress);
     }
 
     public void Dispose()
     {
         timer.Dispose();
     }
+
+    
 }
