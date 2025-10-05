@@ -59,8 +59,11 @@
         if (!firstRender) return;
 
         var value = await JS.InvokeAsync<string>("themeManager.initColorTheme");
-        value = value.Replace("pico.", "").Replace(".min.css", "");
-        selected = value == "" ? "default" : value;
+        if (value != "pico.min.css")
+        {
+            value = value.Replace("pico.", "").Replace(".min.css", "");
+        }
+        selected = value == "pico.min.css" ? "default" : value;
         StateHasChanged();
     }
 }
