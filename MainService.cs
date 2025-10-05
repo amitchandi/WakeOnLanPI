@@ -1,24 +1,11 @@
 using System.Net;
 using System.Net.NetworkInformation;
-using WoLPi.Components.Pages;
 
 namespace WoLPi;
 
 public class MainService(IConfiguration configuration)
 {
-    readonly string TargetIpAddress = configuration["TargetIp"] ?? throw new Exception("TargetIp is missing from config");
-    readonly string TargetMacAddress = configuration["TargetMac"] ?? throw new Exception("TargetMac is missing from config");
     readonly int PingTimeout = configuration.GetValue<int>("PingTimeout");
-
-    public async Task<Status> GetStatusAsync()
-    {
-        using Ping pingSender = new();
-        var reply = await pingSender.SendPingAsync(TargetIpAddress, PingTimeout);
-        return new()
-        {
-            IsOn = reply.Status == IPStatus.Success
-        };
-    }
 
     public async Task<Status> GetStatusAsync(string hostNameOrAddress)
     {
@@ -29,9 +16,16 @@ public class MainService(IConfiguration configuration)
             var reply = await pingSender.SendPingAsync(hostNameOrAddress, PingTimeout);
             status.IsOn = reply.Status == IPStatus.Success;
         }
-        catch (Exception ex)
+        catch (PingException ex)
         {
-            status.Error = ex.Message;
+            if (ex.InnerException?.Message == "No such host is known.")
+            {
+                status.Error = ex.InnerException?.Message;
+            }
+            else
+            {
+                status.Error = ex.Message;
+            }
         }
         return status;
     }

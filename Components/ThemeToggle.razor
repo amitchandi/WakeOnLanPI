@@ -1,0 +1,30 @@
+﻿<button type="button" @onclick="ToggleTheme" class="@(_isDark ? "secondary" : "contrast")">
+    @if(_isDark)
+    {
+        <img src="/day-mode.png" width="24" />
+    }
+    else
+    {
+        <img src="/night-mode.png" width="24" />
+    }
+</button>
+
+@code {
+    private bool _isDark;
+
+    [Inject] IJSRuntime JS { get; set; } = default!;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Initialize from JS when component loads
+        if (!firstRender) return;
+
+        _isDark = await JS.InvokeAsync<bool>("themeManager.init");
+        StateHasChanged();
+    }
+
+    private async Task ToggleTheme()
+    {
+        _isDark = await JS.InvokeAsync<bool>("themeManager.toggle");
+    }
+}

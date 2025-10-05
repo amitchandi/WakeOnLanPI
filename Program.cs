@@ -12,8 +12,8 @@ public class Program
             .AddInteractiveServerComponents();
 
         builder.Services
-            .AddScoped<MainService>();
-            // .Configure<List<Server>>(builder.Configuration.GetRequiredSection("Servers"));
+            .AddScoped<MainService>()
+            .AddOpenApi();
 
         var servers = ServerConfigLoader.Load("config.yaml");
         builder.Services.AddSingleton(servers);
@@ -26,6 +26,8 @@ public class Program
         {
             app.UseExceptionHandler("/Error");
         }
+
+        app.MapOpenApi();
 
         app.MapGet("/api/status/{HostnameOrAddress}", async (HttpContext context, MainService service, string HostnameOrAddress) =>
         {

@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="ServerCardInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
     <PackageReference Include="WakeOnLAN" Version="2.0.2" />
     <PackageReference Include="YamlDotNet" Version="16.3.0" />
   </ItemGroup>

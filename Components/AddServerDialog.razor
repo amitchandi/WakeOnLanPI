@@ -4,36 +4,59 @@
   <article>
     <h2>Add Server</h2>
     
-    <form>
+    <EditForm Model="Model">
         <label>
             Server Name
-            <input name="ServerName" placeholder="Server Name" type="text" />
+            <input name="ServerName" placeholder="Server Name" type="text" @bind-value="Model.Servername" />
         </label>
         
         <label>
             Hostname or IP Address
-            <input name="HostnameOrIPAddress" placeholder="test.lan or 192.168.1.1" type="text" />
+            <input name="HostnameOrIPAddress" placeholder="test.lan or 192.168.1.1" type="text" @bind-value="Model.HostnameOrIPAddress" />
         </label>
         
         <label>
             Mac Address
-            <input name="MacAddress" placeholder="00:00:00:00:00:00" type="text" />
+            <input name="MacAddress" placeholder="00:00:00:00:00:00" type="text" @bind-value="Model.MacAddress" />
         </label>
-    </form>
+    </EditForm>
     
     <footer>
-      <button class="secondary">
+        <button class="secondary" @onclick="CloseDialog">
         Cancel
       </button>
-      <button>Confirm</button>
+      <button @onclick="() => SubmitDialog()">Confirm</button>
     </footer>
   </article>
 </dialog>
 
 @code {
     private ElementReference dialog { get; set; }
+    public AddServerModel Model { get; set; } = new();
 
-    private void OpenDialog() {
+    [Parameter]
+    public Action<AddServerModel>? OnSubmit { get; set; }
+
+    public void OpenDialog()
+    {
         JSRuntime.InvokeVoidAsync("openDialog", dialog);
+    }
+
+    public void CloseDialog()
+    {
+        JSRuntime.InvokeVoidAsync("closeDialog", dialog);
+    }
+
+    public void SubmitDialog()
+    {
+        CloseDialog();
+        OnSubmit?.Invoke(Model);
+    }
+
+    public class AddServerModel
+    {
+        public string Servername { get; set; } = "";
+        public string HostnameOrIPAddress { get; set; } = "";
+        public string MacAddress { get; set; } = "";
     }
 }

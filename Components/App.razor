@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en">
 
 <head>
     <meta charset="utf-8" />
@@ -8,7 +8,8 @@
     @* <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]" /> *@
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["WoLPi.styles.css"]" />
-    <link rel="stylesheet" href="css/pico.grey.min.css">
+    <link rel="stylesheet" href="css/pico.min.css">
+    <link rel="stylesheet" href="css/pico.colors.min.css">
     <ImportMap />
     <link rel="icon" type="image/png" href="favicon.png" />
     <HeadOutlet />
@@ -16,6 +17,16 @@
 
 <body>
     <Routes />
+    <script src="js/themeManager.js"></script>
+    <script>
+        // Initialize immediately on load to avoid theme flash
+        (function() {
+          const saved = localStorage.getItem("theme");
+          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          const theme = saved || (prefersDark ? "dark" : "light");
+          document.documentElement.setAttribute("data-theme", theme);
+        })();
+    </script>
     <script src="_framework/blazor.web.js"></script>
     <script src="js/dialog.js"></script>
 </body>

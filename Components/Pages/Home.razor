@@ -1,6 +1,9 @@
 ﻿@page "/"
+
 @using Microsoft.Extensions.Options
+
 @implements IDisposable
+
 @inject MainService mainService
 @inject IConfiguration Configuration
 @inject List<Server> Servers
@@ -8,64 +11,135 @@
 
 @rendermode InteractiveServer
 
-<PageTitle>Wol Pi</PageTitle>
+<PageTitle>Wake on Lan Pi</PageTitle>
 
-<div class="container">
-    Server Status: <span class="@status_class">@isOn</span>
-</div>
+<h1 style="text-align: center">Wake on Lan PI</h1>
 
-<div class="container mt-2">
-    @* <button class="btn btn-outline-primary" @onclick="SendWake">Send Wake</button> *@
-</div>
+<nav>
+    <ul>
+        <li>
+            <ThemeToggle />
+        </li>
+        <li>
+            
+        </li>
+    </ul>
+</nav>
 
-@foreach (var server in Servers)
+@foreach (var chunk in ServerList.Chunk(2))
 {
-    <article>
-        <header>@server.Name - </header>
-        @server.HostnameOrAddress
-        @server.MacAddress
-    </article>
+    <div class="grid">
+    @foreach (var serverCardInfo in chunk)
+    {
+        @if (serverCardInfo.server == null)
+        {
+            <article style="display: flex; justify-content: center; align-items: center; height: 200px">
+                <button type="button" style="margin: auto;" @onclick="AddServer">
+                <img width="24" src="/plus-symbol-button.png" />
+            </button>
+            </article>
+        }
+        else
+        {
+            <ServerCard
+                server="serverCardInfo.server" 
+                IsLoading="@serverCardInfo.IsLoading" 
+                IsValid="@serverCardInfo.IsValid" 
+                IsOn="@serverCardInfo.IsOn" 
+                OnEditSaved="OnEditSaved" />
+        }
+        @if (chunk.Length % 2 != 0)
+        {
+            <div></div>
+        }
+    }
+    </div>
 }
 
-<AddServerDialog />
-
 @code {
-    private string isOn = "Loading...";
-    private string status_class = "text-info";
-    private System.Timers.Timer timer = new(TimeSpan.FromSeconds(2));
+    private PeriodicTimer timer = new(TimeSpan.FromSeconds(5));
+    private CancellationTokenSource cts = new();
+    private List<ServerCardInfo> ServerList = [];
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override void OnInitialized()
     {
-        if (firstRender)
+        base.OnInitialized();
+
+        CreateServerList();
+        _ = UpdateStatusAsync();
+    }
+
+    private async Task UpdateStatusAsync()
+    {
+        while (await timer.WaitForNextTickAsync(cts.Token))
         {
-            timer.Elapsed += async (o, args) =>
+            var tasks = ServerList.Select(async s =>
             {
-                await UpdateStatus();
-            };
-            timer.Start();
+                if (s.IsValid)
+                    await UpdateServerCard(s);
+            });
+
+            await Task.WhenAll(tasks);
+            await InvokeAsync(StateHasChanged);
         }
-
-        StateHasChanged(); // IF NOT USED, your updated version of states will not get rendered
-        await base.OnAfterRenderAsync(firstRender); // Not required, it just returns the `Task.CompletedTask;`
     }
 
-    async Task UpdateStatus()
+    async Task UpdateServerCard(ServerCardInfo serverCardInfo)
     {
-        var status = await mainService.GetStatusAsync();
-        isOn = status.IsOn ? "Online" : "Offline";
-        status_class = status.IsOn ? "text-success" : "text-danger";
-        await InvokeAsync(() => StateHasChanged());
+        if (serverCardInfo.server == null) return;
+
+        var status = await mainService.GetStatusAsync(serverCardInfo.server.HostnameOrAddress);
+        if (status.Error == "No such host is known.")
+        {
+            serverCardInfo.IsValid = false;
+            serverCardInfo.IsOn = false;
+            serverCardInfo.IsLoading = false;
+            return;
+        }
+        serverCardInfo.IsOn = status.IsOn;
+        serverCardInfo.IsLoading = false;
     }
 
-    async void SendWake(string MacAddress)
+    private void CreateServerList()
     {
-        await mainService.SendWake(MacAddress);
+        ServerList.Clear();
+        int index = 0;
+        foreach (var server in Servers)
+        {
+            ServerList.Add(new()
+            {
+                server = server,
+                Index = index++
+            });
+        }
+        ServerList.Add(new()
+        {
+            server = null
+        });
+    }
+
+    private void AddServer()
+    {
+        Servers.Add(new()
+        {
+            Name = "X",
+            HostnameOrAddress = "X",
+            MacAddress = "X"
+        });
+
+        CreateServerList();
+
+        ServerConfigLoader.Save(Servers);
+    }
+
+    private void OnEditSaved()
+    {
+        ServerConfigLoader.Save(Servers);
     }
 
     public void Dispose()
     {
+        cts?.Dispose();
         timer.Dispose();
     }
-
-    
 }

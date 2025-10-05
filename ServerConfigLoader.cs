@@ -22,7 +22,7 @@ public static class ServerConfigLoader
     public static void Save(List<Server> servers, string path = "config.yaml")
     {
         var serializer = new SerializerBuilder()
-            .WithNamingConvention(UnderscoredNamingConvention.Instance)
+            .WithNamingConvention(PascalCaseNamingConvention.Instance)
             .Build();
 
         var yaml = serializer.Serialize(servers);

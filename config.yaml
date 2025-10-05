@@ -1,7 +1,9 @@
-- Name: "Home Server"
-  HostnameOrAddress: "192.168.1.10"
-  MacAddress: "00:1A:2B:3C:4D:5E"
-
-- Name: "NAS"
-  HostnameOrAddress: "nas.local"
-  MacAddress: "11:22:33:44:55:66"
+- Name: Home Server
+  HostnameOrAddress: 192.168.1.88
+  MacAddress: 00:1A:2B:3C:4D:5E
+- Name: NAS
+  HostnameOrAddress: nas.local
+  MacAddress: 11:22:33:44:55:66
+- Name: PI
+  HostnameOrAddress: 192.168.1.68
+  MacAddress: asd
