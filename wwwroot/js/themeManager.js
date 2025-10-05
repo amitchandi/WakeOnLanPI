@@ -1,5 +1,6 @@
 ﻿window.themeManager = {
     key: "theme",
+    colorKey: 'color',
 
     apply(theme) {
         document.documentElement.setAttribute("data-theme", theme);
@@ -22,5 +23,17 @@
         const next = current === "dark" ? "light" : "dark";
         this.apply(next);
         return next === "dark";
+    },
+
+    changeColorTheme(href) {
+        document.getElementById('pico-color-theme').setAttribute('href', 'css/' + href);
+        localStorage.setItem(this.colorKey, href);
+    },
+
+    initColorTheme() {
+        let colorTheme = localStorage.getItem(this.colorKey);
+        if (!colorTheme) colorTheme = 'pico.min.css';
+        this.changeColorTheme(colorTheme);
+        return colorTheme;
     }
 };

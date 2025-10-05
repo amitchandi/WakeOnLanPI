@@ -1,0 +1,66 @@
+﻿@inject IJSRuntime JS
+
+<!-- Radios -->
+<details @ref="dropdown" class="dropdown">
+    <summary>
+        @selected
+    </summary>
+    <ul>
+        @foreach (var theme in themes)
+        {
+            <li>
+                <label>
+                    <input type="radio" name="phase" value="@theme.Value" checked="@(theme.Key == selected)" @onchange="() => Select(theme.Key)" />
+                    @theme.Key
+                </label>
+            </li>
+        }
+    </ul>
+</details>
+
+@code {
+    ElementReference dropdown { get; set; }
+    private string selected = "default";
+
+    Dictionary<string, string> themes = new()
+    {
+        {"amber", "pico.amber.min.css"},
+        {"blue", "pico.blue.min.css"},
+        {"cyan", "pico.cyan.min.css"},
+        {"fuchsia", "pico.fuchsia.min.css"},
+        {"green", "pico.green.min.css"},
+        {"grey", "pico.grey.min.css"},
+        {"indigo", "pico.indigo.min.css"},
+        {"jade", "pico.jade.min.css"},
+        {"lime", "pico.lime.min.css"},
+        {"default", "pico.min.css"},
+        {"orange", "pico.orange.min.css"},
+        {"pink", "pico.pink.min.css"},
+        {"pumpkin", "pico.pumpkin.min.css"},
+        {"purple", "pico.purple.min.css"},
+        {"red", "pico.red.min.css"},
+        {"sand", "pico.sand.min.css"},
+        {"slate", "pico.slate.min.css"},
+        {"violet", "pico.violet.min.css"},
+        {"yellow", "pico.yellow.min.css"},
+        {"zinc", "pico.zinc.min.css"},
+    };
+
+    async void Select(string Key)
+    {
+        selected = Key;
+        await JS.InvokeVoidAsync("toggleDropdown", dropdown);
+        await JS.InvokeVoidAsync("themeManager.changeColorTheme", themes[selected]);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Initialize from JS when component loads
+        if (!firstRender) return;
+
+        var value = await JS.InvokeAsync<string>("themeManager.initColorTheme");
+        value = value.Replace("pico.", "").Replace(".min.css", "");
+        selected = value == "" ? "default" : value;
+        StateHasChanged();
+    }
+}
