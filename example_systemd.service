@@ -1,0 +1,21 @@
+[Unit]
+Description=WakeOnLan Pi Webapp
+
+[Service]
+WorkingDirectory=/home/example-user/WoLPi/
+ExecStart=/home/example-user/WoLPi/WoLPi
+Restart=always
+# Restart service after 10 seconds if the dotnet service crashes:
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=dotnet-WoLPi
+User=example-user
+
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=DOTNET_NOLOGO=true
+
+# uncomment this to set hostname/IP and port
+#Environment=ASPNETCORE_URLS=http://localhost:5000
+
+[Install]
+WantedBy=multi-user.target
