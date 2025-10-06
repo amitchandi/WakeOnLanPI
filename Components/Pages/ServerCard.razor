@@ -65,6 +65,15 @@
     public required Server server { get; set; }
 
     [Parameter]
+    public required string Name { get; set; }
+
+    [Parameter]
+    public required string HostnameOrAddress { get; set; }
+
+    [Parameter]
+    public required string MacAddress { get; set; }
+
+    [Parameter]
     public required bool IsOn { get; set; }
 
     [Parameter]
@@ -96,6 +105,7 @@
     protected override void OnParametersSet()
     {
         StatusColor = !IsValid ? "pico-color-amber-350" : IsLoading ? "pico-color-blue-550" : IsOn ? "pico-color-jade-400" : "pico-color-red-550";
+        EditServer = server;
     }
 
     private void ToggleEdit()
@@ -108,6 +118,11 @@
         server = EditServer;
         IsEdit = false;
         OnEditSaved?.Invoke();
+    }
+
+    public void Reload()
+    {
+        StateHasChanged();
     }
 
     async void SendWake()

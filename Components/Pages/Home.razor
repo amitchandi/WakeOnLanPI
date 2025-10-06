@@ -6,8 +6,8 @@
 
 @inject MainService mainService
 @inject IConfiguration Configuration
-@inject List<Server> Servers
 @inject IJSRuntime JSRuntime
+@inject ServerConfigService ConfigService
 
 @rendermode InteractiveServer
 
@@ -42,7 +42,7 @@
         else
         {
             <ServerCard
-                server="serverCardInfo.server" 
+                server="serverCardInfo.server"
                 IsLoading="@serverCardInfo.IsLoading" 
                 IsValid="@serverCardInfo.IsValid" 
                 IsOn="@serverCardInfo.IsOn" 
@@ -67,6 +67,8 @@
 
         CreateServerList();
         _ = UpdateStatusAsync();
+
+        ConfigService.OnConfigChanged += Reload;
     }
 
     private async Task UpdateStatusAsync()
@@ -104,7 +106,7 @@
     {
         ServerList.Clear();
         int index = 0;
-        foreach (var server in Servers)
+        foreach (var server in ConfigService.Servers)
         {
             ServerList.Add(new()
             {
@@ -120,7 +122,7 @@
 
     private void AddServer()
     {
-        Servers.Add(new()
+        ConfigService.Servers.Add(new()
         {
             Name = "X",
             HostnameOrAddress = "X",
@@ -129,17 +131,24 @@
 
         CreateServerList();
 
-        ServerConfigLoader.Save(Servers);
+        ConfigService.Save();
     }
 
     private void OnEditSaved()
     {
-        ServerConfigLoader.Save(Servers);
+        ConfigService.Save();
+    }
+
+    private async void Reload()
+    {
+        CreateServerList();
+        await InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()
     {
         cts?.Dispose();
         timer.Dispose();
+        ConfigService.OnConfigChanged -= Reload;
     }
 }

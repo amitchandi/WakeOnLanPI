@@ -11,13 +11,12 @@ public class Program
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
 
-        builder.Services
-            .AddScoped<MainService>()
-            .AddOpenApi();
+        builder.Services.AddScoped<MainService>();
 
-        var servers = ServerConfigLoader.Load("config.yaml");
-        builder.Services.AddSingleton(servers);
+        builder.Services.AddSingleton<ServerConfigService>();
 
+        builder.Services.AddSwaggerGen();
+        builder.Services.AddEndpointsApiExplorer();
 
         var app = builder.Build();
 
@@ -27,14 +26,14 @@ public class Program
             app.UseExceptionHandler("/Error");
         }
 
-        app.MapOpenApi();
-
         app.MapGet("/api/status/{HostnameOrAddress}", async (HttpContext context, MainService service, string HostnameOrAddress) =>
         {
             var status = await service.GetStatusAsync(HostnameOrAddress);
             context.Response.StatusCode = status.Error == null ? 400 : 200;
             await context.Response.WriteAsJsonAsync(status);
-        });
+        })
+        .WithDescription("Ping {HostnameOrAddress} for status.")
+        .Produces(200, typeof(MainService.Status));
 
         app.MapGet("/api/wake/{MacAddress}", async (string MacAddress, MainService service) =>
         {
@@ -48,7 +47,15 @@ public class Program
                 Console.WriteLine(ex.Message);
                 return "Something went wrong.";
             }
-        });
+        })
+        .WithDescription("Send Wake on Lan magic packet to {MacAddress}.")
+        .Produces(200, typeof(string));
+
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
 
         app.UseAntiforgery();
 
