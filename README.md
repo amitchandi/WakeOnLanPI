@@ -1,17 +1,19 @@
 # WakeOnLanPI
 
-WakeOnLan Pi is a lightweight .NET web application that exposes a simple REST API for sending **Wake-on-LAN (WOL)** magic packets from a Raspberry Pi to devices on your local network.  
-
-This allows you to remotely power on servers, desktops, or other devices without needing direct access to the machine.
+**WakeOnLanPI** is a lightweight .NET web application that exposes a simple REST API for sending **Wake-on-LAN (WOL)** magic packets and **pinging servers to monitor their status**.  
+Designed for Raspberry Pi (or any .NET-capable machine), it lets you remotely power on and monitor devices on your local network — perfect for home labs, servers, and media PCs.
 
 ---
 
 ## Features
 
-- 🚀 Simple REST API for triggering Wake-on-LAN
-- 💻 Runs on Raspberry Pi (or any Linux/Windows device with .NET installed)
-- 🔧 Configurable MAC and broadcast addresses
-- 🌐 Lightweight and fast, designed for home labs and small networks
+- ⚡ **Wake-on-LAN API & UI** — Send magic packets to power on devices through REST or the web interface.  
+- 🌐 **Web Dashboard** — Clean and lightweight UI to manage and monitor your devices.  
+- 🖥️ **Server Monitoring** — Automatically pings servers to show online/offline status.  
+- 🧠 **Lightweight & Fast** — Optimized for Raspberry Pi and low-resource environments.  
+- 🔧 **Easy Setup** — Simple installation with optional `systemd` service.  
+- 🧩 **Cross-Platform** — Runs on any .NET-supported system (Linux, Windows, macOS).  
+- 🔒 **Local Network Only** — Secure by default, no cloud dependencies.
 
 ---
 
@@ -23,14 +25,88 @@ This allows you to remotely power on servers, desktops, or other devices without
 
 ---
 
-## Installation
 
-1. Clone the repository:
+## Using Prebuilt Release
 
-   ```bash
-   git clone https://github.com/amitchandi/WakeOnLanPI.git
-   cd WakeOnLanPI
+1. Download the latest `app-linux-arm64.zip` from the [Releases](https://github.com/amitchandi/WakeOnLanPI/releases) page.  
+2. Copy or unzip it into a directory on your Raspberry Pi (e.g. `/someuser/wakeonlanpi`).  
+3. Make the binary executable (if needed):
+```bash
+chmod +x WoLPi
+```
+4. Run
+```bash
+./WoLPi
+```
 
-<!--stackedit_data:
-eyJoaXN0b3J5IjpbLTQ3MzQwODAzLDEyMjc3ODYwMTVdfQ==
--->
+## Build From Source
+
+### Clone
+```bash
+git clone https://github.com/amitchandi/WakeOnLanPI.git
+cd WakeOnLanPI
+```
+
+### Build
+
+```bash
+dotnet build
+```
+
+### Run
+```bash
+dotnet run
+```
+or
+```bash
+#Hot Reload
+dotnet watch
+```
+
+### Publish
+```bash
+dotnet publish -c Release -r linux-arm64 \
+  --self-contained false \
+  /p:PublishSingleFile=true \
+  /p:PublishTrimmed=true \
+  -o ./publish
+```
+
+### Example systemd service
+
+Runs on port 5000 by default
+
+example_systemd.service
+```bash
+[Unit]
+Description=WakeOnLan Pi Webapp
+
+[Service]
+WorkingDirectory=/home/example-user/WoLPi/
+ExecStart=/home/example-user/WoLPi/WoLPi
+Restart=always
+# Restart service after 10 seconds if the dotnet service crashes:
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=dotnet-WoLPi
+User=example-user
+
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=DOTNET_NOLOGO=true
+
+# uncomment this to set hostname/IP and port
+#Environment=ASPNETCORE_URLS=http://localhost:5000
+
+[Install]
+WantedBy=multi-user.target
+```
+
+#### Reccomended
+Its reccomended to make a designated user for running the app and to also use a reverse proxy for serving the Web UI/REST API.
+
+```bash
+adduser example-user
+```
+Place the systemd service file in the systemd directory: /etc/systemd/system
+
+*give the service file a memorable name (eg. wakeonlanpi.service)
