@@ -25,7 +25,7 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: Publish for Raspberry Pi (ARM)
-        run: dotnet publish -c Release -r linux-arm64 --self-contained true -o ./publish
+        run: dotnet publish -c Release -r linux-arm64 --self-contained true /p:PublishSingleFile=true /p:PublishTrimmed=true -o ./publish
 
       - name: Archive published files
         run: |
