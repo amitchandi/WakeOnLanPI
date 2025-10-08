@@ -1,4 +1,4 @@
-# WakeOnLanPI
+# ![logo](wwwroot/favicon.png) Wake on Lan PI
 
 **WakeOnLanPI** is a lightweight .NET web application that exposes a simple REST API for sending **Wake-on-LAN (WOL)** magic packets and **pinging servers to monitor their status**.  
 Designed for Raspberry Pi (or any .NET-capable machine), it lets you remotely power on and monitor devices on your local network — perfect for home labs, servers, and media PCs.
@@ -13,6 +13,7 @@ Designed for Raspberry Pi (or any .NET-capable machine), it lets you remotely po
 - 🧠 **Lightweight & Fast** — Optimized for Raspberry Pi and low-resource environments.  
 - 🔧 **Easy Setup** — Simple installation with optional `systemd` service.  
 - 🧩 **Cross-Platform** — Runs on any .NET-supported system (Linux, Windows, macOS).
+- 🎨 **Customizable Themes** — Multiple UI themes with light/dark mode support.
 
 ---
 
@@ -100,6 +101,8 @@ Environment=DOTNET_NOLOGO=true
 WantedBy=multi-user.target
 ```
 
+---
+
 #### Reccomended
 Make a designated user for running the app and to also use a reverse proxy for serving the Web App/REST API.
 
@@ -111,3 +114,15 @@ adduser example-user
 Place the systemd service file in the systemd directory: /etc/systemd/system
 
 *give the service file a memorable name (eg. wakeonlanpi.service)
+
+---
+#### Showcase
+
+Ping
+![ping](images/wolpi_ping.gif)
+
+Wake
+![ping](images/wolpi_wake.gif)
+
+Theme
+![ping](images/wolpi_theme.gif)
