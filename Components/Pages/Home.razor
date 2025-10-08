@@ -34,7 +34,7 @@
         @if (serverCardInfo.server == null)
         {
             <article style="display: flex; justify-content: center; align-items: center; height: 200px">
-                <button type="button" style="margin: auto;" @onclick="AddServer">
+                <button type="button" style="margin: auto;" @onclick="AddServer" data-tooltip="Add Server">
                 <img width="24" src="/plus-symbol-button.png" />
             </button>
             </article>
@@ -46,7 +46,8 @@
                 IsLoading="@serverCardInfo.IsLoading" 
                 IsValid="@serverCardInfo.IsValid" 
                 IsOn="@serverCardInfo.IsOn" 
-                OnEditSaved="OnEditSaved" />
+                OnEditSaved="OnEditSaved"
+                OnDelete="OnDeleteServer" />
         }
         @if (chunk.Length % 2 != 0)
         {
@@ -136,6 +137,15 @@
 
     private void OnEditSaved()
     {
+        ConfigService.Save();
+    }
+
+    private void OnDeleteServer(Server server)
+    {
+        ConfigService.Servers.Remove(server);
+
+        CreateServerList();
+
         ConfigService.Save();
     }
 

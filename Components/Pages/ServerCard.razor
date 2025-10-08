@@ -22,10 +22,10 @@
             <ul>
                 @if (IsEdit)
                 {
-                    <li><button type="button" @onclick="ClickSaveEdit">Save</button></li>
+                    <li><button type="button" @onclick="ClickSaveEdit" data-tooltip="Save">Save</button></li>
                 }
                 <li>
-                    <button type="button" @onclick="ToggleEdit">
+                    <button type="button" style="min-width: 48px" @onclick="ToggleEdit" data-tooltip="@(!IsEdit ? "Edit Server" : "Close Edit")">
                         @if (!IsEdit)
                         {
                             <img width="24" src="/edit.png" />
@@ -39,24 +39,30 @@
             </ul>
         </nav>
     </header>
-    <table>
-        <tbody>
-            <tr>
-                <td>Host or IP</td>
-                <td style="text-align: end;">
-                    <input disabled="@(!IsEdit)" @bind-value="@EditServer.HostnameOrAddress" style="width: auto; height: 40px; margin:auto;" />
-                </td>
-            </tr>
-            <tr>
-                <td>Mac Address</td>
-                <td style="text-align: end; margin: unset">
-                    <input disabled="@(!IsEdit)" @bind-value="@EditServer.MacAddress" style="width: auto; height: 40px; margin:auto;" />
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="container">
+        <input disabled="@(!IsEdit)" @bind-value="@EditServer.HostnameOrAddress" style="height: 40px;" aria-describedby="Hostname-Helper" />
+        <small id="Hostname-Helper">Hostname or IP Address</small>
+
+        <input disabled="@(!IsEdit)" @bind-value="@EditServer.MacAddress" style="height: 40px;" aria-describedby="Macaddress-Helper" />
+        <small id="Macaddress-Helper">Mac Address</small>
+    </div>
     <footer>
-        <button type="button" @onclick="SendWake" disabled="@(IsOn || IsLoading || !IsValid)">Wake Up</button>
+        <nav>
+            <ul>
+                <li>
+                    <button type="button" @onclick="SendWake" disabled="@(IsOn || IsLoading || !IsValid)"
+                            data-tooltip="Wake Me Up Inside!">
+                        Wake Up
+                    </button>
+                </li>
+            </ul>
+
+            <ul>
+                <li>
+                    <button type="button" @onclick="Delete" data-tooltip="Delete Server"><img width="24" src="/bin.png" alt="bin.png" /></button>
+                </li>
+            </ul>
+        </nav>
     </footer>
 </article>
 
@@ -87,6 +93,9 @@
 
     [Parameter]
     public Action? OnEditSaved { get; set; }
+
+    [Parameter]
+    public Action<Server>? OnDelete { get; set; }
 
     private bool IsEdit { get; set; } = false;
     private Server EditServer = new()
@@ -128,5 +137,10 @@
     async void SendWake()
     {
         await mainService.SendWake(server.MacAddress);
+    }
+
+    void Delete()
+    {
+        OnDelete?.Invoke(server);
     }
 }
