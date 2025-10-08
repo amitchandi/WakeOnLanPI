@@ -12,8 +12,7 @@ Designed for Raspberry Pi (or any .NET-capable machine), it lets you remotely po
 - 🖥️ **Server Monitoring** — Automatically pings servers to show online/offline status.  
 - 🧠 **Lightweight & Fast** — Optimized for Raspberry Pi and low-resource environments.  
 - 🔧 **Easy Setup** — Simple installation with optional `systemd` service.  
-- 🧩 **Cross-Platform** — Runs on any .NET-supported system (Linux, Windows, macOS).  
-- 🔒 **Local Network Only** — Secure by default, no cloud dependencies.
+- 🧩 **Cross-Platform** — Runs on any .NET-supported system (Linux, Windows, macOS).
 
 ---
 
@@ -102,7 +101,9 @@ WantedBy=multi-user.target
 ```
 
 #### Reccomended
-Its reccomended to make a designated user for running the app and to also use a reverse proxy for serving the Web UI/REST API.
+Make a designated user for running the app and to also use a reverse proxy for serving the Web App/REST API.
+
+Keep traffic to the app locally or behind a VPN. Exposing the Web App or the REST API is not safe.
 
 ```bash
 adduser example-user
