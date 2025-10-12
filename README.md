@@ -1,7 +1,10 @@
 # ![logo](wwwroot/favicon.png) Wake on Lan PI
 
-**WakeOnLanPI** is a lightweight .NET web application that exposes a simple REST API for sending **Wake-on-LAN (WOL)** magic packets and **pinging servers to monitor their status**.  
-Designed for Raspberry Pi (or any .NET-capable machine), it lets you remotely power on and monitor devices on your local network — perfect for home labs, servers, and media PCs.
+A lightweight .NET web application that exposes a simple REST API for sending Wake-on-LAN (WOL) magic packets and pinging servers to monitor their status.
+
+Designed for Raspberry Pi (or any .NET-capable machine), it lets you remotely power on and monitor devices on your local network.
+
+Intended for home labbers.
 
 ---
 
@@ -19,9 +22,7 @@ Designed for Raspberry Pi (or any .NET-capable machine), it lets you remotely po
 
 ## Requirements
 
-- Raspberry Pi (or any device running Linux/Windows)  
-- [.NET 9 SDK/Runtime](https://dotnet.microsoft.com/download)  
-- A device that supports Wake-on-LAN, with WOL enabled in its BIOS/UEFI and network adapter settings  
+A device that supports Wake-on-LAN, with WOL enabled in its BIOS/UEFI and network adapter settings  
 
 ---
 
@@ -40,6 +41,7 @@ chmod +x WoLPi
 ```
 
 ## Build From Source
+Requires [.NET 9 SDK/Runtime](https://dotnet.microsoft.com/download)
 
 ### Clone
 ```bash
@@ -103,10 +105,10 @@ WantedBy=multi-user.target
 
 ---
 
-#### Reccomended
-Make a designated user for running the app and to also use a reverse proxy for serving the Web App/REST API.
+#### Recommendation
+Make a designated user for running the app and also use a reverse proxy for serving the Web App/REST API.
 
-Keep traffic to the app locally or behind a VPN. Exposing the Web App or the REST API is not safe.
+Keep traffic behind a VPN or only allow local traffic to the app. Exposing the Web App or the REST API publically is not safe.
 
 ```bash
 adduser example-user
