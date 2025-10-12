@@ -7,13 +7,13 @@ Designed for Raspberry Pi (or any .NET-capable machine), it lets you remotely po
 
 ## Features
 
-- ⚡ **Wake-on-LAN API & UI** — Send magic packets to power on devices through REST or the web interface.  
-- 🌐 **Web Dashboard** — Clean and lightweight UI to manage and monitor your devices.  
-- 🖥️ **Server Monitoring** — Automatically pings servers to show online/offline status.  
-- 🧠 **Lightweight & Fast** — Optimized for Raspberry Pi and low-resource environments.  
-- 🔧 **Easy Setup** — Simple installation with optional `systemd` service.  
-- 🧩 **Cross-Platform** — Runs on any .NET-supported system (Linux, Windows, macOS).
-- 🎨 **Customizable Themes** — Multiple UI themes with light/dark mode support.
+- **Wake-on-LAN API & UI** — Send magic packets to power on devices through REST or the web interface.  
+- **Web Dashboard** — Clean and lightweight UI to manage and monitor your devices.  
+- **Server Monitoring** — Automatically pings servers to show online/offline status.  
+- **Lightweight & Fast** — Optimized for Raspberry Pi and low-resource environments.  
+- **Easy Setup** — Simple installation with optional `systemd` service.  
+- **Cross-Platform** — Runs on any .NET-supported system (Linux, Windows, macOS).
+- **Customizable Themes** — Multiple UI themes with light/dark mode support.
 
 ---
 
